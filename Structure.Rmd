@@ -1,0 +1,266 @@
+---
+title: "Diversidad y estructura genética de *Pocillopora* spp en Bahía Culebra"
+author: "Randall Hidalgo"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    fig_width: 11
+    fig_height: 8
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+Load libraries
+
+```{r}
+library(tidyverse)      # v2.0.0
+library(adegenet)       # V2.1.10
+library(mmod)           # v1.3.3
+library(hierfstat)      # v0.5-11
+library(poppr)          # v2.9.5
+library(pophelper)      # v2.3.1
+library(gridExtra)      # v2.3
+library(RColorBrewer)   # v1.1-3
+library(PopGenReport)   # v3.1
+library(patchwork)      # v1.2.0
+```
+
+Load Data
+
+```{r}
+load(file = "pocillopora_cc.RData")
+```
+
+
+# Genetic Structure
+
+## Global Fst
+
+Observe Nei's Fst (Gst) - by locus and global
+
+```{r}
+setPop(pocillopora_cc)<-~Poblacion
+bootstrap <- chao_bootstrap(pocillopora_cc)
+summarise_bootstrap(bootstrap, statistic = Gst_Nei)
+```
+
+## Pairwise Nei's Fst (populations)
+
+Calculate Fst among populations in a pairwise manner
+
+```{r}
+# Fst
+pares<-pairwise.neifst(pocillopora_cc, diploid = T)
+pares
+
+# Confidence interval - bootstrap
+boot.ppfst(pocillopora_cc,nboot = 1000)
+```
+
+## AMOVA
+
+This will be added later because there's only one strata. The following code works but it is not as informative.
+
+```{r}
+# poc_amova<-poppr.amova(pocillopora_cc, ~Region/Poblacion, 
+poc_amova<-poppr.amova(pocillopora_cc, ~Poblacion, 
+                       missing="ignore", 
+                       within = T, clonecorrect = T)
+
+poc_amova
+
+# Permutation test
+Aeutsignif<-randtest(poc_amova, nrepet = 999) # significancia
+Aeutsignif
+```
+
+## Discriminant Analysis of Principal Components
+
+This is a graphical way to show clusters of microsatellite data. First, it is necessary to obtain the number of PCs necessary.
+
+```{r}
+# Substitue NA values because dudi.pca functions needs no NAs
+datos<-tab(pocillopora_cc, freq=T, NA.method="mean")
+datos<-tab(pocillopora_cc, freq=T, NA.method="zero")
+
+# Calculate PCA
+pca1 = dudi.pca(datos, scannf = FALSE, scale = FALSE, nf = 3)
+
+# Calculate percentage of variance explained by each axis (PCA)
+percent = pca1$eig/sum(pca1$eig)*100
+
+# Plot
+barplot(percent, ylab = "Variance explicada (%)", ylim = c(0,50),
+        names.arg = round(percent, 1))
+
+# crossvalidation
+crossval = xvalDapc(datos, pocillopora_cc$pop, 
+                    result = "groupMean", xval.plot = TRUE)
+
+# The number of PCA is the one associated with the lowest root mean square error (12 in this case)
+crossval$`Root Mean Squared Error by Number of PCs of PCA` %>% 
+  round(digits = 3)
+
+numPCs = as.numeric(crossval$`Number of PCs Achieving Lowest MSE`)
+numPCs
+```
+
+Actual plot
+
+```{r}
+dapc1 = dapc(pocillopora_cc, 
+             pocillopora_cc$pop, 
+             n.pca = numPCs, n.da = 3)
+
+# Create a dataframe with individual coordinates
+ind_coords = as.data.frame(dapc1$ind.coord)
+
+
+# Raname dataframe's columns
+colnames(ind_coords) = c("Axis1","Axis2")
+
+# Add a columns with individuals
+ind_coords$Ind = indNames(pocillopora_cc)
+# Add column with populations
+ind_coords$Site = pocillopora_cc$pop
+
+# Calculate centroid position (mean) for each population
+centroid = aggregate(cbind(Axis1, Axis2) ~ Site, 
+                     data = ind_coords, FUN = mean)
+
+# Add centroid's coordinates to ind_coords df
+ind_coords = left_join(ind_coords, centroid, 
+                       by = "Site", suffix = c("",".cen"))
+
+# Define colors
+cols = brewer.pal(nPop(pocillopora_cc), "Set2")
+
+# Customize labels
+xlab = paste("Axis 1 (", format(round(percent[1], 1), 
+                                nsmall=1)," %)", sep="")
+ylab = paste("Axis 2 (", format(round(percent[2], 1), 
+                                nsmall=1)," %)", sep="")
+
+
+
+# Scatterplot using axis1 vs. axis2
+ggplot(data = ind_coords, aes(x = Axis1, y = Axis2))+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  # spider segments
+  geom_segment(aes(xend = Axis1.cen, yend = Axis2.cen, 
+                   colour = Site), show.legend = F)+
+  # points
+  geom_point(aes(fill = Site), shape = 21, 
+             size = 3, show.legend = F)+
+  # Centroids
+  geom_label(data = centroid, aes(label = Site, fill = Site), 
+             size = 4, show.legend = F)+
+  # Colors
+  scale_fill_manual(values = cols)+
+  scale_colour_manual(values = cols)+
+  # Axis
+  labs(x = xlab, y = ylab)+
+  ggtitle("DAPC")+
+  theme_bw()
+```
+
+## STRUCTURe Software
+
+### Evanno's Method
+
+```{r}
+# STRUCTURE files (do not use this command to read local files)
+sfiles <- 
+  list.files(path="C:/Users/Usuario/Desktop/Proyecto Structure/Tesis_final/tesis_final/50k100k/Results", 
+             full.names=T) # <-- Look carefully here! You must put in the path where you have put the results files. No other files can be in that directory!
+# basic usage
+slist <- readQ(files=sfiles, filetype="structure")
+
+sr1 <- summariseQ(tabulateQ(slist))
+
+p <- evannoMethodStructure(data=sr1,exportplot=F,returnplot=T,returndata=F,basesize=12,linesize=0.7)
+grid.arrange(p)
+```
+
+### STRUCTURE plot
+
+```{r}
+# plot
+
+cols = brewer.pal(3, "Set1")
+
+# Load data K = 2
+struc_k2<-read.csv("C:/Users/Usuario/Desktop/Proyecto Structure/structure_R_2.csv", sep = ";")
+names(struc_k2)<-c("ID", "missing", "pop", 
+                "cluster1", "cluster2")
+
+# Load data K = 3
+struc_k3<-read.csv("C:/Users/Usuario/Desktop/Proyecto Structure/structure_R_3.csv", sep = ";")
+names(struc_k3)<-c("ID", "missing", "pop", 
+                "cluster1", "cluster2", "cluster3")
+
+struc2<-pivot_longer(data = struc_k2, 
+             cols = c(cluster1, cluster2),
+             names_to = "cluster", 
+             values_to = "probabilidad")
+
+struc3<-pivot_longer(data = struc_k3, 
+             cols = c(cluster1, cluster2, cluster3),
+             names_to = "cluster", 
+             values_to = "probabilidad")
+
+struc2<-struc2 %>% 
+  mutate(ID=as.factor(ID), probabilidad=as.numeric(probabilidad),
+         cluster=as.factor(cluster), pop=as.factor(pop))
+
+struc3<-struc3 %>% 
+  mutate(ID=as.factor(ID), probabilidad=as.numeric(probabilidad),
+         cluster=as.factor(cluster), pop=as.factor(pop))
+
+
+K2 <- struc2 %>% 
+  ggplot(aes(ID, probabilidad, fill=cluster))+
+  geom_col(width = 1)+
+  ylab("Probabilidad")+
+  geom_vline(xintercept = c(30.5, 60.5))+
+  scale_y_continuous(expand = c(0,0))+
+  scale_fill_manual(values = cols[1:2])+
+  theme(axis.text.x = element_blank(),
+        legend.position = "none", 
+        #axis.text.x = element_text(angle = 90),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+K3 <- struc3 %>% 
+  ggplot(aes(ID, probabilidad, fill=cluster))+
+  geom_col(width = 1)+
+  ylab("Probabilidad")+
+  geom_vline(xintercept = c(30.5, 60.5))+
+  scale_y_continuous(expand = c(0,0))+
+  scale_fill_manual(values = cols[c(1,2,3)])+
+  scale_x_discrete(breaks = c("J15", "M15", "Z15"),
+                   labels = c("Jícaro", "Matapalo", "Zapotillal"))+
+  theme(axis.text.x = element_text(size = 20),
+        legend.position = "none", 
+        #axis.text.x = element_text(angle = 90),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+plots <- K2 / K3 + plot_layout(axes = "collect")
+plots
+```
+
+
+
+
+
+
+

@@ -1,0 +1,281 @@
+---
+title: "Diversidad y estructura genética de *Pocillopora* spp en Bahía Culebra"
+author: "Randall Hidalgo"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    fig_width: 11
+    fig_height: 8
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+Load libraries
+
+```{r}
+library(tidyverse)      # v2.0.0
+library(pegas)          # v1.3
+library(poppr)          # v2.9.5
+library(adegenet)       # V2.1.10
+library(PopGenUtils)    # v.0.1.8
+library(hierfstat)      # v0.5-11
+library(RClone)         # v1.0.3
+library(gt)             # v.0.11.0
+library(RColorBrewer)   # v1.1-3
+```
+
+Load genind data 
+
+```{r}
+load(file = "genind_pocillopora.RData")
+```
+
+## Hardy-Weinberg Equilibrum
+
+```{r}
+hw.test(genind_pocillopora)
+```
+
+# Clonal Structure
+## Accumulation Curve
+
+This plot shows if the data is enough to distinguish clones among samples. A plateau should be reached.
+
+```{r}
+genotype_curve(genind_pocillopora, 
+               sample = 1000, 
+               dropna = T)
+```
+
+Based on the plot, 7 loci are enough.
+
+## Probability of Identity
+
+```{r}
+pid<-pid_calc(genind_pocillopora)
+pid
+```
+
+## Multilocus Genotypes
+
+When different samples posses the same genotype for every locus they are treated as the same individual.
+
+```{r}
+poppr(genind_pocillopora)
+```
+
+All three populations have 30 samples but only Zapotillal has 30 MLGs. On the contrary, Jícaro has only 3 MLGs.
+
+To see the distribution of these MLGs they can be plotted.
+
+```{r}
+# plot
+graf<-as.data.frame(mlg.table(genind_pocillopora, 
+                              background = T, plot = F))
+
+graf$pops<-rownames(graf)
+graf2<-pivot_longer(graf, cols = contains("MLG"),
+                    names_to = "MLG", values_to = "Sum_MLG")
+
+graf2<-aggregate(Sum_MLG~MLG+pops, graf2, sum)
+
+graf2 %>% 
+  mutate(MLG=as.factor(MLG)) %>% 
+  filter(Sum_MLG>0)  %>% 
+  ggplot(aes(reorder(MLG, desc(Sum_MLG)),  Sum_MLG))+
+  geom_col(width = 0.9)+
+  facet_grid(~pops, scales = "free_x")+
+  theme_bw()+
+  labs(x= "MLG", y="Sum")+
+  theme(axis.text.x = element_text(angle = 90),
+        panel.grid = element_blank(),)
+```
+
+## Mininum Spanning Network
+
+Relationship among MLG can also be observed by using an haplotype network (minimum spanning networks)
+
+```{r}
+# Calculate a distance matrix
+dist<-diss.dist(genind_pocillopora, percent = F, mat = F)
+
+# Create the minimum spanning network
+network<-poppr.msn(genind_pocillopora, distmat = dist, 
+                   showplot = F, include.ties = T)
+
+
+# Draw the plot
+paleta<-brewer.pal(3, "Set1")
+
+# haplotype network
+
+set.seed(15) # every time the plot is run, a different plot will be shown
+plot_poppr_msn(genind_pocillopora, network, inds = "ALL", 
+               mlg = T, 
+               gadj = 1.5, palette = paleta, gweight = 2,
+               cutoff = NULL, quantiles = FALSE,
+               nodescale = 100, size.leg = F, pop.leg = F)
+
+# Add legend
+## Circles
+legend(x= 0.787, y = 0.80, legend = c("", "", ""), 
+       pch = 1, pt.cex = c(12, 8, 3), bty = "n",
+       y.intersp = c(2.4, 7, 0.00001), 
+       title = "Samples/Node")
+
+## MLGs
+text(x = rep(0.9, 3), 
+     y = c(0.656, 0.65 - 0.145, 0.65 - 0.250), 
+     labels = c("21", "9", "1"), pos = 4, 
+     cex = 1, col = "black")
+
+## Population
+legend(x = 0.787, y = 1.0, title = "Population", 
+       bty = "n", y.intersp = c(0.8, 0.7, 0.7, 0.7),
+       legend = c("Jícaro", "Matapalo", "Zapotillal"),
+       pch = NA, fill = paleta)
+```
+
+The poppr function provides values for N (samples) and MLGs, so clonal richness can be calculated by using the formula R = (MLG-1) / (N-1). R can also be obtained with RClone
+
+```{r}
+# transform data to RClone format
+
+df<-genind2df(genind_pocillopora) # from genind to dataframe
+pobs<-df$pop                      # assign populations
+datos<-df %>% select(-pop)        # remove populations from df
+
+# RClone does not recognize NA values, so they will be input as 999
+
+nulos<-which(is.na(datos))
+matriz<-as.matrix(datos)
+matriz[nulos]<-999
+datos<-as.data.frame(matriz)
+
+# Convert to RClone
+clones<-convert_GC(datos, 3)
+
+# Calculate Clonal Richness
+riq_clon<-clonal_index(clones, vecpop = pobs)
+riq_clon
+```
+
+# Clone correction
+
+Data should be corrected to avoid bias
+
+```{r}
+# Para tener datos con la correción por clones
+pocillopora_cc<-clonecorrect(genind_pocillopora, 
+                             strata = ~Poblacion)
+```
+
+A little test to observe how HWE changed from whole data to clone corrected.
+
+```{r}
+hw.test(genind_pocillopora)
+hw.test(pocillopora_cc)
+```
+
+# Genetic diversity
+
+## Diversity by locus
+
+```{r}
+locus_table(pocillopora_cc,index = "simpson",lev = "allele")
+```
+
+The amount of alleles ranges from 2 (Pd4) to 11 (Pd2-007). Other diversity indexes are shown in the table. Other stats are shown with the basic.stats function:
+
+```{r}
+# stats by locus
+estadisticas<-basic.stats(pocillopora_cc, diploid = T, digits = 3)
+
+# generate table
+tabla<-rbind(estadisticas$perloc, estadisticas$overall)
+rownames(tabla)[12]<-"mean"
+tabla$Locus<-rownames(tabla)
+tabla %>% 
+  select(Locus, everything()) %>% 
+  gt() %>% 
+  opt_stylize(style = 1)
+```
+
+## Diversity per population
+
+### Allelic Richness
+
+```{r}
+# Set analysis by population
+setPop(pocillopora_cc)<-~Poblacion
+
+# Calculate allelic richness
+riqueza<-allelic.richness(pocillopora_cc, diploid = T)
+
+# Mean 
+round(apply(riqueza$Ar, MARGIN = 2, FUN = mean), 3)
+
+# SD
+round(apply(riqueza$Ar, MARGIN = 2, FUN = sd), 3)
+```
+
+### Observed Heterocygosity 
+
+```{r}
+# basic.stats is used for H0, He and FIS
+estadisticas<-basic.stats(pocillopora_cc, diploid = T, digits = 3)
+
+round(apply(estadisticas$Ho, MARGIN = 2, FUN = mean), 3)
+round(apply(estadisticas$Ho, MARGIN = 2, FUN = sd), 3)
+```
+
+### Expected Heterocygosity 
+
+```{r}
+estadisticas<-basic.stats(pocillopora_cc, diploid = T, digits = 3)
+
+round(apply(estadisticas$Hs, MARGIN = 2, FUN = mean), 3)
+round(apply(estadisticas$Hs, MARGIN = 2, FUN = sd), 3)
+```
+
+### Inbreeding Coefficient (FIS)
+
+```{r}
+estadisticas<-basic.stats(pocillopora_cc, diploid = T, digits = 3)
+
+round(colMeans(estadisticas$Fis, na.rm = T), 3)
+
+# bootstrap
+boot.ppfis(pocillopora_cc, nboot = 999)
+```
+
+### Private alleles
+
+```{r}
+alelosPrivados<-private_alleles(pocillopora_cc, 
+                                form = locus~.,
+                                count.alleles = F, 
+                                report = "table")
+
+apply(alelosPrivados, 1, sum)
+```
+
+```{r}
+save(pocillopora_cc, file = "pocillopora_cc.RData")
+```
+
+
+
+
+
+
+
+
+

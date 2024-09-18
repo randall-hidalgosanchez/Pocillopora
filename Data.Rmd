@@ -1,0 +1,81 @@
+---
+title: "Diversidad y estructura genética de *Pocillopora* spp en Bahía Culebra"
+author: "Randall Hidalgo"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    fig_width: 11
+    fig_height: 8
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+Load Libraries Needed
+
+```{r}
+library(tidyverse)      # v2.0.0
+library(stringr)        # v1.5.0
+library(pegas)          # v1.3
+library(adegenet)       # V2.1.10
+```
+
+Load the data and give appropriate format
+
+```{r}
+# Main data
+
+Pocillopora<-read.csv("C:/Users/Usuario/Dropbox/Tesis/Resultados/02. Analisis/Genotipos.csv", 
+                      sep = ",", header = T)
+
+
+Pocillopora<-Pocillopora %>% 
+  # The marker Pd2-003 will not be used
+  select(-c(Pd2.003, X.7)) %>% 
+  # more populations will be added later, for now these 3 are the only ones
+  filter(Poblacion=="Jicaro"|
+           Poblacion=="Matapalo"|
+           Poblacion=="Zapotillal")
+
+
+# Transform data to a loci object
+names(Pocillopora)<-str_replace(names(Pocillopora), "\\.", "_")
+alelos_pocillopora<-alleles2loci(Pocillopora, ploidy = 2, 
+                                 rownames = 1, population = 2)
+
+# Transform data to a genind object
+genind_pocillopora<-loci2genind(alelos_pocillopora, ploidy = 2,
+                                na.alleles = "NA")
+
+
+# Import strata
+Estratos<-read.csv("C:/Users/Usuario/Dropbox/Tesis/Resultados/02. Analisis/Estratos.csv", 
+                   sep = ";", header = T)
+
+# Same as before, more population will be added later
+Estratos<-Estratos %>% 
+  filter(Poblacion=="Jicaro"|
+           Poblacion=="Matapalo"|
+           Poblacion=="Zapotillal")
+
+
+# Add Strata to gening object
+other(genind_pocillopora)<-Estratos
+strata(genind_pocillopora)<-data.frame(genind_pocillopora@other)
+nameStrata(genind_pocillopora)<-~Region/Poblacion/ID
+
+# ID is not a strata but function requires 3 strata so I added it.
+```
+
+Save genind object to RData for posterior use
+
+```{r}
+save(genind_pocillopora, file = "genind_pocillopora.RData")
+```
+
