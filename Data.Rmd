@@ -17,11 +17,10 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE)
 ```
 
-Load Libraries Needed
+Load libraries needed
 
 ```{r}
 library(tidyverse)      # v2.0.0
-library(stringr)        # v1.5.0
 library(pegas)          # v1.3
 library(adegenet)       # V2.1.10
 ```
@@ -31,21 +30,14 @@ Load the data and give appropriate format
 ```{r}
 # Main data
 
-Pocillopora<-read.csv("C:/Users/Usuario/Dropbox/Tesis/Resultados/02. Analisis/Genotipos.csv", 
+Pocillopora<-read.csv("Pocillopora.csv", 
                       sep = ",", header = T)
 
-
-Pocillopora<-Pocillopora %>% 
-  # The marker Pd2-003 will not be used
-  select(-c(Pd2.003, X.7)) %>% 
-  # more populations will be added later, for now these 3 are the only ones
-  filter(Poblacion=="Jicaro"|
-           Poblacion=="Matapalo"|
-           Poblacion=="Zapotillal")
+# remove column 1
+Pocillopora<-Pocillopora[,-1] 
 
 
 # Transform data to a loci object
-names(Pocillopora)<-str_replace(names(Pocillopora), "\\.", "_")
 alelos_pocillopora<-alleles2loci(Pocillopora, ploidy = 2, 
                                  rownames = 1, population = 2)
 
@@ -55,18 +47,11 @@ genind_pocillopora<-loci2genind(alelos_pocillopora, ploidy = 2,
 
 
 # Import strata
-Estratos<-read.csv("C:/Users/Usuario/Dropbox/Tesis/Resultados/02. Analisis/Estratos.csv", 
-                   sep = ";", header = T)
-
-# Same as before, more population will be added later
-Estratos<-Estratos %>% 
-  filter(Poblacion=="Jicaro"|
-           Poblacion=="Matapalo"|
-           Poblacion=="Zapotillal")
-
+Strata<-read.csv("Strata.csv", sep = ",", header = T)
+Strata<-Strata[,-1]
 
 # Add Strata to gening object
-other(genind_pocillopora)<-Estratos
+other(genind_pocillopora)<-Strata
 strata(genind_pocillopora)<-data.frame(genind_pocillopora@other)
 nameStrata(genind_pocillopora)<-~Region/Poblacion/ID
 

@@ -64,22 +64,6 @@ pares
 boot.ppfst(pocillopora_cc,nboot = 1000)
 ```
 
-## AMOVA
-
-This will be added later because there's only one strata. The following code works but it is not as informative.
-
-```{r}
-# poc_amova<-poppr.amova(pocillopora_cc, ~Region/Poblacion, 
-poc_amova<-poppr.amova(pocillopora_cc, ~Poblacion, 
-                       missing="ignore", 
-                       within = T, clonecorrect = T)
-
-poc_amova
-
-# Permutation test
-Aeutsignif<-randtest(poc_amova, nrepet = 999) # significancia
-Aeutsignif
-```
 
 ## Discriminant Analysis of Principal Components
 
@@ -179,7 +163,7 @@ ggplot(data = ind_coords, aes(x = Axis1, y = Axis2))+
 ```{r}
 # STRUCTURE files (do not use this command to read local files)
 sfiles <- 
-  list.files(path="C:/Users/Usuario/Desktop/Proyecto Structure/Tesis_final/tesis_final/50k100k/Results", 
+  list.files(path="STRUCTURE_Results", 
              full.names=T) # <-- Look carefully here! You must put in the path where you have put the results files. No other files can be in that directory!
 # basic usage
 slist <- readQ(files=sfiles, filetype="structure")
@@ -257,10 +241,5 @@ K3 <- struc3 %>%
 plots <- K2 / K3 + plot_layout(axes = "collect")
 plots
 ```
-
-
-
-
-
 
 

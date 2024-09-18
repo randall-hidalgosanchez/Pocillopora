@@ -100,7 +100,9 @@ graf2 %>%
 
 ## Mininum Spanning Network
 
-Relationship among MLG can also be observed by using an haplotype network (minimum spanning networks)
+Relationship among MLG can also be observed by using an haplotype network (minimum spanning networks).
+
+**Note: the network looks awkward here, but it looks fine when saving it as tiff.
 
 ```{r}
 # Calculate a distance matrix
@@ -141,6 +143,7 @@ legend(x = 0.787, y = 1.0, title = "Population",
        bty = "n", y.intersp = c(0.8, 0.7, 0.7, 0.7),
        legend = c("Jícaro", "Matapalo", "Zapotillal"),
        pch = NA, fill = paleta)
+
 ```
 
 The poppr function provides values for N (samples) and MLGs, so clonal richness can be calculated by using the formula R = (MLG-1) / (N-1). R can also be obtained with RClone
@@ -270,12 +273,5 @@ apply(alelosPrivados, 1, sum)
 ```{r}
 save(pocillopora_cc, file = "pocillopora_cc.RData")
 ```
-
-
-
-
-
-
-
 
 
