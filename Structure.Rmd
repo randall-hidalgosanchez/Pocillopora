@@ -182,12 +182,12 @@ grid.arrange(p)
 cols = brewer.pal(3, "Set1")
 
 # Load data K = 2
-struc_k2<-read.csv("C:/Users/Usuario/Desktop/Proyecto Structure/structure_R_2.csv", sep = ";")
+struc_k2<-read.csv("Structure_plots/structure_R_2.csv", sep = ";")
 names(struc_k2)<-c("ID", "missing", "pop", 
                 "cluster1", "cluster2")
 
 # Load data K = 3
-struc_k3<-read.csv("C:/Users/Usuario/Desktop/Proyecto Structure/structure_R_3.csv", sep = ";")
+struc_k3<-read.csv("Structure_plots/structure_R_3.csv", sep = ";")
 names(struc_k3)<-c("ID", "missing", "pop", 
                 "cluster1", "cluster2", "cluster3")
 
