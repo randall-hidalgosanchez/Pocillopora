@@ -7,7 +7,7 @@
 
         <meta name="author" content="Randall Hidalgo" />
     
-        <meta name="date" content="2024-09-17" />
+        <meta name="date" content="2024-11-24" />
     
     <title>Diversidad y estructura genética de Pocillopora spp en Bahía Culebra</title>
 
@@ -1278,7 +1278,7 @@ margin-left: 0 !important;
     <div id="postamble" data-toggle="wy-nav-shift" class="status">
                   <p class="author"><span class="glyphicon glyphicon-user"></span> Randall
 Hidalgo</p>
-                        <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2024-09-17</p>
+                        <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2024-11-24</p>
           </div>
    </div>
      
@@ -1290,52 +1290,37 @@ Hidalgo</p>
 <div id="main">
 <p>Load libraries needed</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)      <span class="co"># v2.0.0</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(stringr)        <span class="co"># v1.5.0</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(pegas)          <span class="co"># v1.3</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(adegenet)       <span class="co"># V2.1.10</span></span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(pegas)          <span class="co"># v1.3</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(adegenet)       <span class="co"># V2.1.10</span></span></code></pre></div>
 <p>Load the data and give appropriate format</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Main data</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>Pocillopora<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">&quot;C:/Users/Usuario/Dropbox/Tesis/Resultados/02. Analisis/Genotipos.csv&quot;</span>, </span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>Pocillopora<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">&quot;Pocillopora.csv&quot;</span>, </span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                      <span class="at">sep =</span> <span class="st">&quot;,&quot;</span>, <span class="at">header =</span> T)</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>Pocillopora<span class="ot">&lt;-</span>Pocillopora <span class="sc">%&gt;%</span> </span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="co"># The marker Pd2-003 will not be used</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(Pd2<span class="fl">.003</span>, X<span class="fl">.7</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="co"># more populations will be added later, for now these 3 are the only ones</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="fu">filter</span>(Poblacion<span class="sc">==</span><span class="st">&quot;Jicaro&quot;</span><span class="sc">|</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>           Poblacion<span class="sc">==</span><span class="st">&quot;Matapalo&quot;</span><span class="sc">|</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>           Poblacion<span class="sc">==</span><span class="st">&quot;Zapotillal&quot;</span>)</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co"># Transform data to a loci object</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="fu">names</span>(Pocillopora)<span class="ot">&lt;-</span><span class="fu">str_replace</span>(<span class="fu">names</span>(Pocillopora), <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span>, <span class="st">&quot;_&quot;</span>)</span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>alelos_pocillopora<span class="ot">&lt;-</span><span class="fu">alleles2loci</span>(Pocillopora, <span class="at">ploidy =</span> <span class="dv">2</span>, </span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>                                 <span class="at">rownames =</span> <span class="dv">1</span>, <span class="at">population =</span> <span class="dv">2</span>)</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co"># Transform data to a genind object</span></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>genind_pocillopora<span class="ot">&lt;-</span><span class="fu">loci2genind</span>(alelos_pocillopora, <span class="at">ploidy =</span> <span class="dv">2</span>,</span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>                                <span class="at">na.alleles =</span> <span class="st">&quot;NA&quot;</span>)</span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co"># Import strata</span></span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>Estratos<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">&quot;C:/Users/Usuario/Dropbox/Tesis/Resultados/02. Analisis/Estratos.csv&quot;</span>, </span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>                   <span class="at">sep =</span> <span class="st">&quot;;&quot;</span>, <span class="at">header =</span> T)</span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co"># Same as before, more population will be added later</span></span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>Estratos<span class="ot">&lt;-</span>Estratos <span class="sc">%&gt;%</span> </span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>  <span class="fu">filter</span>(Poblacion<span class="sc">==</span><span class="st">&quot;Jicaro&quot;</span><span class="sc">|</span></span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>           Poblacion<span class="sc">==</span><span class="st">&quot;Matapalo&quot;</span><span class="sc">|</span></span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a>           Poblacion<span class="sc">==</span><span class="st">&quot;Zapotillal&quot;</span>)</span>
-<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a></span>
-<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="co"># Add Strata to gening object</span></span>
-<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="fu">other</span>(genind_pocillopora)<span class="ot">&lt;-</span>Estratos</span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="fu">strata</span>(genind_pocillopora)<span class="ot">&lt;-</span><span class="fu">data.frame</span>(genind_pocillopora<span class="sc">@</span>other)</span>
-<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="fu">nameStrata</span>(genind_pocillopora)<span class="ot">&lt;-</span><span class="er">~</span>Region<span class="sc">/</span>Poblacion<span class="sc">/</span>ID</span>
-<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a></span>
-<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="co"># ID is not a strata but function requires 3 strata so I added it.</span></span></code></pre></div>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co"># remove column 1</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>Pocillopora<span class="ot">&lt;-</span>Pocillopora[,<span class="sc">-</span><span class="dv">1</span>] </span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># Transform data to a loci object</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>alelos_pocillopora<span class="ot">&lt;-</span><span class="fu">alleles2loci</span>(Pocillopora, <span class="at">ploidy =</span> <span class="dv">2</span>, </span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>                                 <span class="at">rownames =</span> <span class="dv">1</span>, <span class="at">population =</span> <span class="dv">2</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co"># Transform data to a genind object</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>genind_pocillopora<span class="ot">&lt;-</span><span class="fu">loci2genind</span>(alelos_pocillopora, <span class="at">ploidy =</span> <span class="dv">2</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>                                <span class="at">na.alleles =</span> <span class="st">&quot;NA&quot;</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co"># Import strata</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>Strata<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">&quot;Strata.csv&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;,&quot;</span>, <span class="at">header =</span> T)</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>Strata<span class="ot">&lt;-</span>Strata[,<span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co"># Add Strata to gening object</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="fu">other</span>(genind_pocillopora)<span class="ot">&lt;-</span>Strata</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="fu">strata</span>(genind_pocillopora)<span class="ot">&lt;-</span><span class="fu">data.frame</span>(genind_pocillopora<span class="sc">@</span>other)</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="fu">nameStrata</span>(genind_pocillopora)<span class="ot">&lt;-</span><span class="er">~</span>Region<span class="sc">/</span>Poblacion<span class="sc">/</span>ID</span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co"># ID is not a strata but function requires 3 strata so I added it.</span></span></code></pre></div>
 <p>Save genind object to RData for posterior use</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">save</span>(genind_pocillopora, <span class="at">file =</span> <span class="st">&quot;genind_pocillopora.RData&quot;</span>)</span></code></pre></div>
 </div>
