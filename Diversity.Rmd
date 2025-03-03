@@ -114,14 +114,14 @@ network<-poppr.msn(genind_pocillopora, distmat = dist,
 
 
 # Draw the plot
-paleta<-brewer.pal(3, "Set1")
+cols = c("#66C2A5", "#FC8D62", "#8DA0CB")
 
 # haplotype network
 
 set.seed(15) # every time the plot is run, a different plot will be shown
 plot_poppr_msn(genind_pocillopora, network, inds = "ALL", 
                mlg = T, 
-               gadj = 1.5, palette = paleta, gweight = 2,
+               gadj = 1.5, palette = cols, gweight = 2,
                cutoff = NULL, quantiles = FALSE,
                nodescale = 100, size.leg = F, pop.leg = F)
 
@@ -142,8 +142,13 @@ text(x = rep(0.9, 3),
 legend(x = 0.787, y = 1.0, title = "Population", 
        bty = "n", y.intersp = c(0.8, 0.7, 0.7, 0.7),
        legend = c("Jícaro", "Matapalo", "Zapotillal"),
-       pch = NA, fill = paleta)
+       pch = NA, fill = cols)
 
+```
+
+```{r, eval=FALSE, echo=FALSE}
+tiff("network.tiff", res = 300, height = 800*3, width = 1000*3)
+dev.off()
 ```
 
 The poppr function provides values for N (samples) and MLGs, so clonal richness can be calculated by using the formula R = (MLG-1) / (N-1). R can also be obtained with RClone
@@ -183,8 +188,11 @@ pocillopora_cc<-clonecorrect(genind_pocillopora,
 A little test to observe how HWE changed from whole data to clone corrected.
 
 ```{r}
-hw.test(genind_pocillopora)
+hw.test(genind_pocillopora) 
 hw.test(pocillopora_cc)
+
+# Pd2-006 is not treated as following HWE as p value varies near 0.05
+# however, Pd3-008 always show a p value greater than 0.05
 ```
 
 # Genetic diversity

@@ -1,0 +1,225 @@
+
+
+----------------------------------------------------
+STRUCTURE by Pritchard, Stephens and Donnelly (2000)
+     and Falush, Stephens and Pritchard (2003)
+       Code by Pritchard, Falush and Hubisz
+             Version 2.3.4 (Jul 2012)
+----------------------------------------------------
+
+
+
+Command line arguments:   bin\structure -m C:\Users\Usuario\Desktop\Proyecto Structure\Clone corrected\Pd3\clone_yes_pd3\50k100k\mainparams -e C:\Users\Usuario\Desktop\Proyecto Structure\Clone corrected\Pd3\clone_yes_pd3\50k100k\extraparams 
+Input File:    C:\Users\Usuario\Desktop\Proyecto Structure\Clone corrected\Pd3\clone_yes_pd3\project_data
+
+Run parameters:
+   45 individuals
+   11 loci
+   4 populations assumed
+   50000 Burn-in period
+   100000 Reps
+
+
+--------------------------------------------
+Proportion of membership of each pre-defined
+ population in each of the 4 clusters
+
+Given    Inferred Clusters              Number of
+ Pop       1      2      3      4      Individuals
+
+  1:     0.004  0.005  0.988  0.003        3
+  2:     0.069  0.519  0.333  0.079       12
+  3:     0.280  0.269  0.135  0.316       30
+--------------------------------------------
+
+Allele-freq. divergence among pops (Net nucleotide distance),
+computed using point estimates of P.
+
+      1       2       3       4      
+ 1      -    0.0523  0.3876  0.0088  
+ 2   0.0523     -    0.4035  0.0636  
+ 3   0.3876  0.4035     -    0.3966  
+ 4   0.0088  0.0636  0.3966     -    
+
+Average distances (expected heterozygosity) between individuals in same cluster:
+cluster  1  : 0.5610 
+cluster  2  : 0.5190 
+cluster  3  : 0.4074 
+cluster  4  : 0.5209 
+
+--------------------------------------------
+Estimated Ln Prob of Data   = -830.4
+Mean value of ln likelihood = -762.5
+Variance of ln likelihood   = 135.9
+Mean value of alpha         = 0.0334
+
+Mean value of Fst_1         = 0.2239
+Mean value of Fst_2         = 0.1890
+Mean value of Fst_3         = 0.5210
+Mean value of Fst_4         = 0.2492
+
+
+Inferred ancestry of individuals:
+        Label (%Miss) Pop:  Inferred clusters
+  1      J01    (0)    1 :  0.003 0.002 0.993 0.002 
+  2      J02    (0)    1 :  0.003 0.003 0.992 0.002 
+  3      J22    (9)    1 :  0.006 0.010 0.980 0.004 
+  4      M01    (0)    2 :  0.002 0.002 0.993 0.002 
+  5      M09    (0)    2 :  0.002 0.002 0.993 0.003 
+  6      M12    (9)    2 :  0.003 0.002 0.992 0.003 
+  7      M17   (18)    2 :  0.076 0.860 0.003 0.061 
+  8      M20    (0)    2 :  0.002 0.002 0.994 0.002 
+  9      M21    (9)    2 :  0.059 0.931 0.003 0.007 
+ 10      M22    (9)    2 :  0.061 0.928 0.003 0.009 
+ 11      M25    (9)    2 :  0.059 0.853 0.003 0.085 
+ 12      M26   (18)    2 :  0.087 0.834 0.002 0.077 
+ 13      M28    (9)    2 :  0.341 0.038 0.002 0.619 
+ 14      M29    (9)    2 :  0.055 0.927 0.003 0.015 
+ 15      M30    (9)    2 :  0.084 0.845 0.002 0.069 
+ 16      Z01    (9)    3 :  0.054 0.859 0.009 0.078 
+ 17      Z02    (9)    3 :  0.326 0.014 0.003 0.656 
+ 18      Z03   (18)    3 :  0.563 0.063 0.002 0.371 
+ 19      Z04    (9)    3 :  0.345 0.019 0.004 0.631 
+ 20      Z05    (9)    3 :  0.289 0.155 0.002 0.554 
+ 21      Z06    (9)    3 :  0.516 0.160 0.003 0.320 
+ 22      Z07   (27)    3 :  0.003 0.003 0.990 0.003 
+ 23      Z08    (9)    3 :  0.055 0.929 0.002 0.014 
+ 24      Z09   (18)    3 :  0.333 0.009 0.004 0.655 
+ 25      Z10   (18)    3 :  0.309 0.531 0.002 0.158 
+ 26      Z11    (9)    3 :  0.575 0.009 0.002 0.413 
+ 27      Z12    (9)    3 :  0.137 0.707 0.002 0.154 
+ 28      Z13   (18)    3 :  0.272 0.585 0.002 0.140 
+ 29      Z14    (0)    3 :  0.012 0.006 0.971 0.011 
+ 30      Z15    (9)    3 :  0.006 0.008 0.979 0.007 
+ 31      Z16   (18)    3 :  0.091 0.834 0.003 0.072 
+ 32      Z17   (18)    3 :  0.002 0.002 0.994 0.002 
+ 33      Z18    (9)    3 :  0.643 0.011 0.002 0.344 
+ 34      Z19   (27)    3 :  0.507 0.018 0.003 0.473 
+ 35      Z20    (9)    3 :  0.202 0.624 0.002 0.172 
+ 36      Z21   (18)    3 :  0.320 0.011 0.003 0.666 
+ 37      Z22    (9)    3 :  0.343 0.020 0.005 0.632 
+ 38      Z23    (9)    3 :  0.317 0.038 0.007 0.638 
+ 39      Z24    (9)    3 :  0.059 0.917 0.004 0.020 
+ 40      Z25    (9)    3 :  0.123 0.671 0.037 0.169 
+ 41      Z26    (9)    3 :  0.627 0.020 0.003 0.349 
+ 42      Z27    (9)    3 :  0.630 0.064 0.002 0.305 
+ 43      Z28    (9)    3 :  0.312 0.008 0.003 0.678 
+ 44      Z29    (9)    3 :  0.102 0.772 0.002 0.124 
+ 45      Z30    (9)    3 :  0.320 0.010 0.003 0.667 
+
+
+Estimated Allele Frequencies in each cluster
+First column gives estimated ancestral frequencies
+
+
+Locus 1 : Pd2_001 
+4 alleles
+0.0% missing data
+   1   (0.149) 0.053 0.022 0.709 0.072 
+   2   (0.482) 0.329 0.918 0.057 0.210 
+   3   (0.086) 0.016 0.012 0.222 0.013 
+   4   (0.283) 0.602 0.048 0.012 0.705 
+
+Locus 2 : Pd2_006 
+5 alleles
+0.0% missing data
+   1   (0.397) 0.553 0.499 0.144 0.494 
+   2   (0.250) 0.182 0.247 0.804 0.256 
+   3   (0.078) 0.024 0.116 0.003 0.024 
+   4   (0.172) 0.178 0.122 0.007 0.166 
+   5   (0.103) 0.063 0.016 0.041 0.060 
+
+Locus 3 : Pd2_007 
+11 alleles
+0.0% missing data
+   1   (0.055) 0.011 0.008 0.825 0.008 
+   2   (0.074) 0.019 0.028 0.139 0.018 
+   3   (0.127) 0.100 0.185 0.005 0.121 
+   4   (0.089) 0.051 0.127 0.004 0.033 
+   5   (0.054) 0.016 0.066 0.002 0.008 
+   6   (0.108) 0.153 0.104 0.005 0.080 
+   7   (0.084) 0.038 0.090 0.003 0.043 
+   8   (0.057) 0.017 0.057 0.002 0.016 
+   9   (0.204) 0.427 0.267 0.009 0.581 
+  10   (0.081) 0.111 0.041 0.003 0.058 
+  11   (0.067) 0.056 0.027 0.003 0.033 
+
+Locus 4 : Pd3_009 
+7 alleles
+4.4% missing data
+   1   (0.069) 0.014 0.010 0.750 0.011 
+   2   (0.069) 0.014 0.010 0.178 0.011 
+   3   (0.507) 0.591 0.881 0.057 0.720 
+   4   (0.114) 0.202 0.036 0.005 0.106 
+   5   (0.109) 0.115 0.017 0.005 0.111 
+   6   (0.067) 0.017 0.034 0.003 0.014 
+   7   (0.065) 0.046 0.011 0.003 0.026 
+
+Locus 5 : Pd3_008 
+4 alleles
+0.0% missing data
+   1   (0.334) 0.317 0.313 0.845 0.340 
+   2   (0.283) 0.310 0.212 0.139 0.272 
+   3   (0.214) 0.255 0.227 0.009 0.226 
+   4   (0.169) 0.118 0.247 0.007 0.162 
+
+Locus 6 : Pd3_002 
+4 alleles
+6.7% missing data
+   1   (0.300) 0.206 0.235 0.667 0.243 
+   2   (0.070) 0.013 0.010 0.297 0.011 
+   3   (0.320) 0.425 0.385 0.018 0.328 
+   4   (0.310) 0.356 0.370 0.018 0.418 
+
+Locus 7 : Pd3_010 
+3 alleles
+75.6% missing data
+   1   (0.233) 0.184 0.231 0.332 0.140 
+   2   (0.485) 0.530 0.486 0.611 0.587 
+   3   (0.281) 0.286 0.283 0.057 0.273 
+
+Locus 8 : Pd3_004 
+4 alleles
+6.7% missing data
+   1   (0.079) 0.015 0.011 0.181 0.012 
+   2   (0.085) 0.016 0.012 0.771 0.013 
+   3   (0.714) 0.923 0.838 0.040 0.939 
+   4   (0.123) 0.047 0.139 0.007 0.037 
+
+Locus 9 : Pd4 
+2 alleles
+0.0% missing data
+   1   (0.093) 0.017 0.013 0.962 0.014 
+   2   (0.907) 0.983 0.987 0.038 0.986 
+
+Locus 10 : Pd11 
+10 alleles
+0.0% missing data
+   1   (0.056) 0.011 0.008 0.309 0.008 
+   2   (0.055) 0.011 0.008 0.090 0.008 
+   3   (0.053) 0.010 0.008 0.397 0.008 
+   4   (0.052) 0.010 0.007 0.045 0.008 
+   5   (0.240) 0.399 0.382 0.010 0.519 
+   6   (0.180) 0.224 0.277 0.008 0.172 
+   7   (0.181) 0.256 0.208 0.008 0.226 
+   8   (0.074) 0.056 0.085 0.003 0.031 
+   9   (0.053) 0.012 0.008 0.042 0.010 
+  10   (0.056) 0.011 0.008 0.088 0.009 
+
+Locus 11 : PV5 
+10 alleles
+22.2% missing data
+   1   (0.112) 0.035 0.086 0.524 0.032 
+   2   (0.131) 0.066 0.071 0.360 0.081 
+   3   (0.106) 0.077 0.020 0.089 0.137 
+   4   (0.090) 0.051 0.393 0.004 0.019 
+   5   (0.184) 0.252 0.254 0.008 0.386 
+   6   (0.066) 0.021 0.045 0.003 0.017 
+   7   (0.087) 0.050 0.079 0.004 0.061 
+   8   (0.064) 0.050 0.017 0.003 0.031 
+   9   (0.094) 0.364 0.022 0.004 0.186 
+  10   (0.065) 0.034 0.013 0.003 0.050 
+
+Values of parameters used in structure:
+DATAFILE=C:\Users\Usuario\Desktop\Proyecto Structure\Clone corrected\Pd3\clone_yes_pd3\project_data,	OUTFILE=C:\Users\Usuario\Desktop\Proyecto Structure\Clone corrected\Pd3\clone_yes_pd3\50k100k\Results\50k100k_run_49,	NUMINDS=45,	NUMLOCI=11,	MISSING=-9,	LABEL=1,	POPDATA=1,	POPFLAG=0,	PHENOTYPE=0,	EXTRACOLS=0,	MAXPOPS=4,	BURNIN=50000,	NUMREPS=100000,	USEPOPINFO=0,	INFERALPHA=1,	INFERLAMBDA=0,	POPSPECIFICLAMBDA=0,	POPALPHAS=0,	COMPUTEPROB=1,	NOADMIX=0,	ADMBURNIN=2500,	UPDATEFREQ=1,	PRINTLIKES=0,	INTERMEDSAVE=0,	PRINTKLD=0,	PRINTNET=0,	PRINTLAMBDA=0,	ANCESTDIST=0,	NUMBOXES=1000,	ANCESTPINT=0.90000,	GENSBACK=2,	MIGRPRIOR=0.05000,	PRINTQHAT=0,	PRINTQSUM=0,	ALPHA=1.0000,	FREQSCORR=1,	FPRIORMEAN=0.0100,	FPRIORSD=0.0500,	ONEFST=0,	LAMBDA=1.0000,	UNIFPRIORALPHA=1,	ALPHAMAX=10.0000,	ALPHAPRIORA=1.0000,	ALPHAPRIORB=2.0000,	ALPHAPROPSD=0.0250,	STARTATPOPINFO=0,	RANDOMIZE=1,	LINKAGE=0,	METROFREQ=10,	REPORTHITRATE=0,	MARKOVPHASE=-1,	PHASED=0,	PLOIDY=2,	PHASEINFO=0	LOCPRIOR=0, 	LOCPRIORINIT=1.000000, 	LOCDATA=0, 	LOCISPOP=0, 	LOCPRIORSTEP=0.100000, 	MAXLOCPRIOR=20.000000, 	SEED=1735861512,	
+[STRAT parameters]:    NUMSIMSTATS=1000,	PHENOTYPECOL=-9,	POOLFREQ=10,	LOCUSxONLY=0,	EMERROR=0.00100,	MISSINGPHENO=-9,	

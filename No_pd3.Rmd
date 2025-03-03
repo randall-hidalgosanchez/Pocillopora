@@ -1,0 +1,533 @@
+---
+title: "no Pd3-010"
+author: "Randall Hidalgo"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Datos sin Pd3-010
+
+```{r}
+#Pocillopora_No_Pd3<-Pocillopora_No_Pd3[,-1]
+Pocillopora_No_Pd3<-Pocillopora |> select(-Pd3_010, -X_6)
+
+No_Pd3_genind<-alleles2loci(Pocillopora_No_Pd3, ploidy = 2, 
+                                 rownames = 1, population = 2)
+
+No_Pd3_genind<-loci2genind(No_Pd3_genind, ploidy = 2,
+                                na.alleles = "NA")
+```
+
+Los estratos son los mismos
+
+```{r}
+other(No_Pd3_genind)<-Strata
+strata(No_Pd3_genind)<-data.frame(No_Pd3_genind@other)
+nameStrata(No_Pd3_genind)<-~Region/Poblacion/ID
+```
+
+HWE no cambia
+
+```{r}
+hw.test(No_Pd3_genind)
+```
+
+Curva de acumulacion no cambia
+
+```{r}
+genotype_curve(No_Pd3_genind, 
+               sample = 1000, 
+               dropna = T)
+```
+
+PID no cambia
+
+```{r}
+pid<-pid_calc(No_Pd3_genind)
+pid
+```
+
+MLG es igual
+
+```{r}
+poppr(No_Pd3_genind)
+```
+
+grafico de barras es igual
+
+```{r}
+graf<-as.data.frame(mlg.table(No_Pd3_genind, 
+                              background = T, plot = F))
+
+graf$pops<-rownames(graf)
+graf2<-pivot_longer(graf, cols = contains("MLG"),
+                    names_to = "MLG", values_to = "Sum_MLG")
+
+graf2<-aggregate(Sum_MLG~MLG+pops, graf2, sum)
+
+graf2 %>% 
+  mutate(MLG=as.factor(MLG)) %>% 
+  filter(Sum_MLG>0)  %>% 
+  ggplot(aes(reorder(MLG, desc(Sum_MLG)),  Sum_MLG))+
+  geom_col(width = 0.9)+
+  facet_grid(~pops, scales = "free_x")+
+  theme_bw()+
+  labs(x= "MLG", y="Sum")+
+  theme(axis.text.x = element_text(angle = 90),
+        panel.grid = element_blank(),)
+```
+
+red de haplotipos cambia su forma pero no las relaciones
+
+```{r}
+# Calculate a distance matrix
+dist<-diss.dist(No_Pd3_genind, percent = F, mat = F)
+
+# Create the minimum spanning network
+network<-poppr.msn(No_Pd3_genind, distmat = dist, 
+                   showplot = F, include.ties = T)
+
+
+# Draw the plot
+paleta<-brewer.pal(3, "Set1")
+
+# haplotype network
+
+set.seed(15) # every time the plot is run, a different plot will be shown
+plot_poppr_msn(No_Pd3_genind, network, inds = "ALL", 
+               mlg = T, 
+               gadj = 1.5, palette = paleta, gweight = 2,
+               cutoff = NULL, quantiles = FALSE,
+               nodescale = 100, size.leg = F, pop.leg = F)
+
+# Add legend
+## Circles
+legend(x= 0.787, y = 0.80, legend = c("", "", ""), 
+       pch = 1, pt.cex = c(12, 8, 3), bty = "n",
+       y.intersp = c(2.4, 7, 0.00001), 
+       title = "Samples/Node")
+
+## MLGs
+text(x = rep(0.9, 3), 
+     y = c(0.656, 0.65 - 0.145, 0.65 - 0.250), 
+     labels = c("21", "9", "1"), pos = 4, 
+     cex = 1, col = "black")
+
+## Population
+legend(x = 0.787, y = 1.0, title = "Population", 
+       bty = "n", y.intersp = c(0.8, 0.7, 0.7, 0.7),
+       legend = c("Jícaro", "Matapalo", "Zapotillal"),
+       pch = NA, fill = paleta)
+
+```
+
+riqueza clonal no cambia
+
+```{r}
+# transform data to RClone format
+
+df<-genind2df(No_Pd3_genind) # from genind to dataframe
+pobs<-df$pop                      # assign populations
+datos<-df %>% select(-pop)        # remove populations from df
+
+# RClone does not recognize NA values, so they will be input as 999
+
+nulos<-which(is.na(datos))
+matriz<-as.matrix(datos)
+matriz[nulos]<-999
+datos<-as.data.frame(matriz)
+
+# Convert to RClone
+clones<-convert_GC(datos, 3)
+
+# Calculate Clonal Richness
+riq_clon<-clonal_index(clones, vecpop = pobs)
+riq_clon
+```
+
+corregir clones
+
+```{r}
+# Para tener datos con la correción por clones
+No_Pd3_cc<-clonecorrect(No_Pd3_genind, 
+                             strata = ~Poblacion)
+
+hw.test(No_Pd3_cc)
+```
+
+diversidad por locus
+
+```{r}
+locus_table(No_Pd3_cc,index = "simpson",lev = "allele")
+```
+
+## Diversity per population
+
+### Allelic Richness
+
+```{r}
+# Set analysis by population
+setPop(No_Pd3_cc)<-~Poblacion
+
+# Calculate allelic richness
+riqueza<-allelic.richness(No_Pd3_cc, diploid = T)
+
+# Mean 
+round(apply(riqueza$Ar, MARGIN = 2, FUN = mean), 3)
+
+# SD
+round(apply(riqueza$Ar, MARGIN = 2, FUN = sd), 3)
+```
+
+### Observed Heterocygosity 
+
+```{r}
+# basic.stats is used for H0, He and FIS
+estadisticas<-basic.stats(No_Pd3_cc, diploid = T, digits = 3)
+
+round(apply(estadisticas$Ho, MARGIN = 2, FUN = mean), 3)
+round(apply(estadisticas$Ho, MARGIN = 2, FUN = sd), 3)
+```
+
+### Expected Heterocygosity 
+
+```{r}
+estadisticas<-basic.stats(No_Pd3_cc, diploid = T, digits = 3)
+
+round(apply(estadisticas$Hs, MARGIN = 2, FUN = mean), 3)
+round(apply(estadisticas$Hs, MARGIN = 2, FUN = sd), 3)
+```
+
+### Inbreeding Coefficient (FIS)
+
+```{r}
+estadisticas<-basic.stats(No_Pd3_cc, diploid = T, digits = 3)
+
+round(colMeans(estadisticas$Fis, na.rm = T), 3)
+
+# bootstrap
+boot.ppfis(No_Pd3_cc, nboot = 999)
+```
+
+### Private alleles
+
+```{r}
+alelosPrivados<-private_alleles(No_Pd3_cc, 
+                                form = locus~.,
+                                count.alleles = F, 
+                                report = "table")
+
+apply(alelosPrivados, 1, sum)
+```
+
+STRUCTURA
+
+Observe Nei's Fst (Gst) - by locus and global
+
+```{r}
+setPop(No_Pd3_cc)<-~Poblacion
+bootstrap <- chao_bootstrap(No_Pd3_cc)
+summarise_bootstrap(bootstrap, statistic = Gst_Nei)
+```
+
+
+Calculate Fst among populations in a pairwise manner
+
+```{r}
+# Fst
+pares<-pairwise.neifst(No_Pd3_cc, diploid = T)
+pares
+
+# Confidence interval - bootstrap
+boot.ppfst(No_Pd3_cc,nboot = 1000)
+```
+
+
+## Discriminant Analysis of Principal Components
+
+This is a graphical way to show clusters of microsatellite data. First, it is necessary to obtain the number of PCs necessary.
+
+```{r}
+# Substitue NA values because dudi.pca functions needs no NAs
+datos<-tab(No_Pd3_cc, freq=T, NA.method="mean")
+datos<-tab(No_Pd3_cc, freq=T, NA.method="zero")
+
+# Calculate PCA
+pca1 = dudi.pca(datos, scannf = FALSE, scale = FALSE, nf = 3)
+
+# Calculate percentage of variance explained by each axis (PCA)
+percent = pca1$eig/sum(pca1$eig)*100
+
+# Plot
+barplot(percent, ylab = "Variance explicada (%)", ylim = c(0,50),
+        names.arg = round(percent, 1))
+
+# crossvalidation
+crossval = xvalDapc(datos, No_Pd3_cc$pop, 
+                    result = "groupMean", xval.plot = TRUE)
+
+# The number of PCA is the one associated with the lowest root mean square error (12 in this case)
+crossval$`Root Mean Squared Error by Number of PCs of PCA` %>% 
+  round(digits = 3)
+
+numPCs = as.numeric(crossval$`Number of PCs Achieving Lowest MSE`)
+numPCs
+```
+
+Actual plot
+
+```{r}
+dapc1 = dapc(No_Pd3_cc, 
+             No_Pd3_cc$pop, 
+             n.pca = numPCs, n.da = 3)
+
+# Create a dataframe with individual coordinates
+ind_coords = as.data.frame(dapc1$ind.coord)
+
+
+# Raname dataframe's columns
+colnames(ind_coords) = c("Axis1","Axis2")
+
+# Add a columns with individuals
+ind_coords$Ind = indNames(No_Pd3_cc)
+# Add column with populations
+ind_coords$Site = No_Pd3_cc$pop
+
+# Calculate centroid position (mean) for each population
+centroid = aggregate(cbind(Axis1, Axis2) ~ Site, 
+                     data = ind_coords, FUN = mean)
+
+# Add centroid's coordinates to ind_coords df
+ind_coords = left_join(ind_coords, centroid, 
+                       by = "Site", suffix = c("",".cen"))
+
+# Define colors
+cols = brewer.pal(nPop(No_Pd3_cc), "Set2")
+
+# Customize labels
+xlab = paste("Axis 1 (", format(round(percent[1], 1), 
+                                nsmall=1)," %)", sep="")
+ylab = paste("Axis 2 (", format(round(percent[2], 1), 
+                                nsmall=1)," %)", sep="")
+
+
+
+# Scatterplot using axis1 vs. axis2
+ggplot(data = ind_coords, aes(x = Axis1, y = Axis2))+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)+
+  # spider segments
+  geom_segment(aes(xend = Axis1.cen, yend = Axis2.cen, 
+                   colour = Site), show.legend = F)+
+  # points
+  geom_point(aes(fill = Site), shape = 21, 
+             size = 3, show.legend = F)+
+  # Centroids
+  geom_label(data = centroid, aes(label = Site, fill = Site), 
+             size = 4, show.legend = F)+
+  # Colors
+  scale_fill_manual(values = cols)+
+  scale_colour_manual(values = cols)+
+  # Axis
+  labs(x = xlab, y = ylab)+
+  ggtitle("DAPC")+
+  theme_bw()
+```
+
+
+
+Code to export to STRUCTURE
+
+```{r, echo=F, eval=FALSE}
+
+# Exportar a STRUCTURE
+
+# Función para exportar
+
+genind2structure <- function(obj, file="", pops=FALSE){
+  if(!"genind" %in% class(obj)){
+    warning("Function was designed for genind objects.")
+  }
+  
+  # get the max ploidy of the dataset
+  pl <- max(obj@ploidy)
+  # get the number of individuals
+  S <- nInd(obj)
+  # column of individual names to write; set up data.frame
+  tab <- data.frame(ind=rep(indNames(obj), each=pl))
+  # column of pop ids to write
+  if(pops){
+    popnums <- 1:nPop(obj)
+    names(popnums) <- as.character(unique(pop(obj)))
+    popcol <- rep(popnums[as.character(pop(obj))], each=pl)
+    tab <- cbind(tab, data.frame(pop=popcol))
+  }
+  loci <- locNames(obj) 
+  # add columns for genotypes
+  tab <- cbind(tab, matrix(-9, nrow=dim(tab)[1], ncol=nLoc(obj), dimnames=list(NULL,loci)))
+  
+  # begin going through loci
+  for(L in loci){
+    thesegen <- obj@tab[,grep(paste("^", L, "\\.", sep=""), 
+                              dimnames(obj@tab)[[2]]), 
+                        drop = FALSE] # genotypes by locus
+    al <- 1:dim(thesegen)[2] # numbered alleles
+    for(s in 1:S){
+      if(all(!is.na(thesegen[s,]))){
+        tabrows <- (1:dim(tab)[1])[tab[[1]] == indNames(obj)[s]] # index of rows in output to write to
+        tabrows <- tabrows[1:sum(thesegen[s,])] # subset if this is lower ploidy than max ploidy
+        tab[tabrows,L] <- rep(al, times = thesegen[s,])
+      }
+    }
+  }
+  
+  # export table
+  write.table(tab, file=file, sep="\t", quote=FALSE, row.names=FALSE)
+}
+
+
+# Exportar a STRUCTURE
+
+genind2structure(No_Pd3_cc, 
+                 file="No_Pd3_cc.txt", pops=TRUE)
+
+
+genind2structure(pocillopora_cc, 
+                 file="clone_corrected.txt", pops=TRUE)
+
+```
+
+
+
+## STRUCTURe Software
+
+### Evanno's Method
+
+```{r}
+# STRUCTURE files (do not use this command to read local files)
+sfiles <- 
+  list.files(path="structure_pd3_clone", 
+             full.names=T) # <-- Look carefully here! You must put in the path where you have put the results files. No other files can be in that directory!
+# basic usage
+slist <- readQ(files=sfiles, filetype="structure")
+
+sr1 <- summariseQ(tabulateQ(slist))
+
+p <- evannoMethodStructure(data=sr1,exportplot=F,returnplot=T,returndata=F,basesize=12,linesize=0.7)
+grid.arrange(p)
+```
+
+```{r}
+tiff("clone_pd3.tiff", res = 300, height = 1600, width = 2400)
+dev.off()
+```
+
+
+### STRUCTURE plot
+
+```{r}
+# plot
+
+cols = cols # colors from dapc
+
+# Load data K = 2
+struc_k2<-read.csv("Structure_plots/clone_structure_R_2.csv", sep = ";")
+names(struc_k2)<-c("ID", "missing", "pop", 
+                "cluster1", "cluster2")
+
+
+struc2<-pivot_longer(data = struc_k2, 
+             cols = c(cluster1, cluster2),
+             names_to = "cluster", 
+             values_to = "probabilidad")
+
+
+struc2<-struc2 %>% 
+  mutate(ID=as.factor(ID), probabilidad=as.numeric(probabilidad),
+         cluster=as.factor(cluster), pop=as.factor(pop)) |> 
+  
+
+K2 <- struc2 |>  
+  ggplot(aes(ID, probabilidad, fill=cluster))+
+  geom_col(width = 1)+
+  ylab("Probabilidad")+
+  geom_vline(xintercept = c(3.5, 15.5))+
+  scale_y_continuous(expand = c(0,0))+
+  scale_fill_manual(values = cols[2:1])+
+  scale_x_discrete(breaks = c("J02", "M22", "Z15"),
+                   labels = c("Jícaro", "Matapalo", "Zapotillal"))+
+  theme(axis.text.x = element_text(size = 16),
+        legend.position = "none", 
+        #axis.text.x = element_text(angle = 90),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank())
+
+```
+
+```{r}
+tiff("structure_pd3.tiff", res = 300, height = 800, width = 2400)
+K2
+dev.off()
+```
+
+
+```{r, eval=FALSE, echo=FALSE}
+# Load data K = 3
+struc_k3<-read.csv("Structure_plots/structure_R_3.csv", sep = ";")
+names(struc_k3)<-c("ID", "missing", "pop", 
+                "cluster1", "cluster2", "cluster3")
+
+
+struc3<-pivot_longer(data = struc_k3, 
+             cols = c(cluster1, cluster2, cluster3),
+             names_to = "cluster", 
+             values_to = "probabilidad")
+
+
+struc3<-struc3 %>% 
+  mutate(ID=as.factor(ID), probabilidad=as.numeric(probabilidad),
+         cluster=as.factor(cluster), pop=as.factor(pop))
+
+
+
+K3 <- struc3 %>% 
+  ggplot(aes(ID, probabilidad, fill=cluster))+
+  geom_col(width = 1)+
+  ylab("Probabilidad")+
+  geom_vline(xintercept = c(30.5, 60.5))+s
+  scale_y_continuous(expand = c(0,0))+
+  scale_fill_manual(values = cols[c(3,1,2)])+
+  scale_x_discrete(breaks = c("J15", "M15", "Z15"),
+                   labels = c("Jícaro", "Matapalo", "Zapotillal"))+
+  theme(axis.text.x = element_text(size = 20),
+        legend.position = "none", 
+        #axis.text.x = element_text(angle = 90),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank())
+```
+
+
+```{r}
+plots <- dapc_plot / K2 + plot_layout(heights = c(8*2,2))
+plots
+```
+
+
+
+
+
+```{r}
+pocillopora_cc_genpop<-genind2genpop(pocillopora_cc)
+pocillopora_cc_genpop@tab
+summary(pocillopora_cc_genpop)
+```
+
+
+
+
+
+
+
+
+
