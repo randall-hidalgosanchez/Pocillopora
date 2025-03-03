@@ -3,6 +3,8 @@ title: "no Pd3-010"
 author: "Randall Hidalgo"
 date: "`r Sys.Date()`"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 Datos sin Pd3-010

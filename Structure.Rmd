@@ -158,7 +158,7 @@ ggplot(data = ind_coords, aes(x = Axis1, y = Axis2))+
 ```
 
 ```{r, eval=FALSE, echo=FALSE}
-tiff(filename = "dapc.tiff", width = 1500*2, height = 1000*2, res = 300)
+tiff(filename = "dapc.tiff", width = 1100*2, height = 800*2, res = 300)
 dev.off()
 ```
 
@@ -224,11 +224,11 @@ K2 <- struc2 %>%
   geom_vline(xintercept = c(3.5, 15.5))+
   scale_y_continuous(expand = c(0,0))+
   scale_fill_manual(values = cols[2:1])+
-  theme(axis.text.x = element_blank(),
+  theme(axis.text = element_blank(),
         legend.position = "none", 
         #axis.text.x = element_text(angle = 90),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank())
+        axis.title = element_blank(),
+        axis.ticks = element_blank())
 
 K3 <- struc3 %>% 
   ggplot(aes(ID, probabilidad, fill=cluster))+
@@ -237,16 +237,24 @@ K3 <- struc3 %>%
   geom_vline(xintercept = c(3.5, 15.5))+
   scale_y_continuous(expand = c(0,0))+
   scale_fill_manual(values = cols[c(1,2,3)])+
-  scale_x_discrete(breaks = c("J15", "M15", "Z15"),
+  scale_x_discrete(breaks = c("J02", "M21", "Z15"),
                    labels = c("Jícaro", "Matapalo", "Zapotillal"))+
-  theme(axis.text.x = element_text(size = 20),
+  theme(axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 20, colour = "black"),
         legend.position = "none", 
         #axis.text.x = element_text(angle = 90),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank())
+        axis.title = element_blank(),
+        axis.ticks = element_blank())
 
 plots <- K2 / K3 + plot_layout(axes = "collect")
 plots
 ```
 
+```{r, eval=FALSE, echo=FALSE}
+tiff(filename = "structure_clone.tiff", 
+     width = 1800*2, height = 800*2, 
+     res = 300)
+
+dev.off()
+```
 
